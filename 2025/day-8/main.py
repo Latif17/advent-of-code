@@ -14,18 +14,14 @@ def part1(arr):
     circuits = []
     junction_position = {}
 
-    counter = 1
-    for _, pos1, pos2 in routes:
+    for _, pos1, pos2 in routes[:1000]:
         print(pos1, pos2)
         if pos1 in junction_position and pos2 in junction_position:
             index_one = junction_position[pos1]
             index_two = junction_position[pos2]
             if index_one != index_two:
                 print("merge", index_one, junction_position[pos2])
-                set1 = circuits[junction_position[pos2]]
-                set2 = circuits[index_one]
-                set3 = set1.union(set2)
-                circuits[index_one] = set3
+                circuits[index_one].update(circuits[index_two])
                 for pos in circuits[index_two]:
                     junction_position[pos] = index_one
                 circuits[index_two].clear()
@@ -44,13 +40,12 @@ def part1(arr):
             circuits.append(set([pos1, pos2]))
             junction_position[pos1] = len(circuits) - 1
             junction_position[pos2] = len(circuits) - 1
-        if counter == 1000:
-            break
-        counter += 1
+
     
     len_circutes =  []
     for circuit in circuits:
-        len_circutes.append(len(circuit))
+        if len(circuit) > 0:
+            len_circutes.append(len(circuit))
     
     len_circutes.sort()
 
