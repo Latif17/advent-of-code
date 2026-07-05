@@ -21,7 +21,10 @@ def part1(arr):
             index_two = junction_position[pos2]
             if index_one != index_two:
                 print("merge", index_one, junction_position[pos2])
-                circuits[index_one].update(circuits[index_two])
+                set1 = circuits[junction_position[pos2]]
+                set2 = circuits[index_one]
+                set3 = set1.union(set2)
+                circuits[index_one] = set3
                 for pos in circuits[index_two]:
                     junction_position[pos] = index_one
                 circuits[index_two].clear()
@@ -53,7 +56,52 @@ def part1(arr):
 
 
 
-    
+
+def part_two(arr):
+    routes = []
+    for i in range(len(arr)):
+        x2, y2, z2 = arr[i][0], arr[i][1], arr[i][2]
+        for j in range(i + 1, len(arr)):
+            x1, y1, z1 = arr[j][0], arr[j][1], arr[j][2]
+            d = sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2)
+            routes.append((d, (x1, y1, z1), (x2, y2, z2)))
+
+    routes.sort()
+
+    circuits = []
+    junction_position = {}
+    track = []
+    for _, pos1, pos2 in routes:
+        track.append([pos1, pos2])
+        if pos1 in junction_position and pos2 in junction_position:
+            index_one = junction_position[pos1]
+            index_two = junction_position[pos2]
+            if index_one != index_two:
+                set1 = circuits[junction_position[pos2]]
+                set2 = circuits[index_one]
+                set3 = set1.union(set2)
+                circuits[index_one] = set3
+                for pos in circuits[index_two]:
+                    junction_position[pos] = index_one
+                circuits[index_two].clear()
+            if len(circuits[index_one]) == len(arr):
+                print(len(circuits[index_one]))
+                break
+            else:
+                track.clear()
+            
+        elif pos1 in junction_position:
+            circuits[junction_position[pos1]].add(pos2)
+            junction_position[pos2] = junction_position[pos1]
+        elif pos2 in junction_position:
+            circuits[junction_position[pos2]].add(pos1)
+            junction_position[pos1] = junction_position[pos2]
+        else:
+            circuits.append(set([pos1, pos2]))
+            junction_position[pos1] = len(circuits) - 1
+            junction_position[pos2] = len(circuits) - 1
+
+    print(track[0][0][0] * track[0][1][0])
         
 
 
@@ -61,4 +109,4 @@ def part1(arr):
 if __name__ == "__main__":
     with open("./input.txt", 'r') as file:
         lines = [[int(c.strip()) for c in line.split(",")] for line in file if line.strip()]
-    part1(lines)
+    part_two(lines)
